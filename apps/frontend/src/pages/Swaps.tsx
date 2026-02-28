@@ -198,7 +198,7 @@ function RequestSwapForm() {
                                         options={colleagues?.map(c => ({ value: c.id, label: `${c.name} (${c.department})` }))}
                                         placeholder="Select Colleague"
                                         onChange={(val: any) => field.onChange(val?.value)}
-                                        value={colleagues?.find(c => c.id === field.value) ? { value: field.value, label: colleagues.find(c => c.id === field.value)?.name } : null}
+                                        value={colleagues?.find(c => c.id === field.value) ? { value: field.value, label: colleagues.find(c => c.id === field.value)?.name || '' } : null}
                                     />
                                 )}
                             />

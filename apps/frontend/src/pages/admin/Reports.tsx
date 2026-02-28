@@ -1,6 +1,6 @@
 import {
     Box, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text,
-    Flex, Button, Icon, SimpleGrid, useColorModeValue, Stack
+    Flex, Button, Icon, SimpleGrid, useColorModeValue, Stack, Heading
 } from '@chakra-ui/react';
 import { trpc } from '../../utils/trpc';
 import { FiDownload, FiBarChart2, FiFileText } from 'react-icons/fi';
@@ -81,7 +81,7 @@ export default function Reports() {
                                 />
                                 <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                                     {chartData.map((entry, index) => (
-                                        <Cell key={`cell-\${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Bar>
                             </BarChart>

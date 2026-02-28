@@ -3,7 +3,7 @@ import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton,
     FormControl, FormLabel, Input, Stack, useToast, Spinner, Badge,
     Flex, InputGroup, InputLeftElement, Icon, HStack, Text, useColorModeValue,
-    VStack
+    VStack, Heading
 } from '@chakra-ui/react';
 import { trpc } from '../../utils/trpc';
 import { useForm, Controller } from 'react-hook-form';
