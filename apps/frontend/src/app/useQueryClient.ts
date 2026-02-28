@@ -1,7 +1,7 @@
 import SuperJSON from 'superjson';
 import { useMemo } from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
+import { httpLink } from '@trpc/client';
 import { trpc } from '../utils/trpc';
 import { useGlobalStateStore } from './GlobalState';
 
@@ -15,7 +15,7 @@ export const useQueryTrpcClient = () => {
   const trpcClient = useMemo(() =>
     trpc.createClient({
       links: [
-        httpBatchLink({
+        httpLink({
           url: APP_URL,
           headers() {
             if (accessToken) {
