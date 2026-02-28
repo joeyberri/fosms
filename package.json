@@ -31,7 +31,11 @@
     "frontend:dev": "nx run frontend:serve",
     "frontend:storybook": "nx run frontend:storybook",
     "migrate:dev": "prisma migrate dev",
-    "docker:env": "docker compose --file docker/docker-compose.yaml up --build"
+    "docker:env": "docker compose --file docker/docker-compose.yaml up --build",
+    "build:all": "nx run-many --target=build --all",
+    "build:backend": "nx build backend",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
   },
   "private": true,
   "devDependencies": {
@@ -106,6 +110,7 @@
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@fastify/cors": "^8.4.0",
+    "@fastify/static": "^9.0.0",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",

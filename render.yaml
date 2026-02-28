@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: fosms
+    env: node
+    plan: free
+    buildCommand: npm install && npx nx build frontend && npx nx build backend
+    startCommand: node dist/apps/backend/main.cjs
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fosms-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: APP_PORT
+        value: 10000
+      - key: API_PREFIX
+        value: /trpc
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+databases:
+  - name: fosms-db
+    plan: free

@@ -6,8 +6,7 @@ import { trpc } from '../utils/trpc';
 import { useGlobalStateStore } from './GlobalState';
 
 export const useQueryTrpcClient = () => {
-  const APP_URL = import.meta.env.VITE_APP_URL;
-  if (!APP_URL) throw new Error('No app url env variable found');
+  const APP_URL = import.meta.env.VITE_APP_URL || '/trpc';
 
   const user = useGlobalStateStore((state) => state.user);
   const accessToken = user?.accessToken;

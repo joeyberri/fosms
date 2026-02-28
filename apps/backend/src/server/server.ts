@@ -5,6 +5,8 @@ import { appRouter } from './router';
 import cors from '@fastify/cors';
 import pretty from 'pino-pretty';
 import pino from 'pino';
+import path from 'path';
+import fastifyStatic from '@fastify/static';
 
 export interface ServerOptions {
   dev?: boolean;
@@ -41,10 +43,22 @@ export function createServer(opts: ServerOptions) {
     trpcOptions: { router: appRouter, createContext },
   });
 
+  // Serve static files from the frontend build
+  const staticPath = path.join(__dirname, '../frontend');
+  server.register(fastifyStatic, {
+    root: staticPath,
+    prefix: '/',
+  });
+
+  // Handle SPA routing: serve index.html for any unknown routes
+  server.setNotFoundHandler((request, reply) => {
+    return reply.sendFile('index.html');
+  });
+
   const stop = () => server.close();
   const start = async () => {
     try {
-      await server.listen({ port });
+      await server.listen({ port, host: '0.0.0.0' });
     } catch (err) {
       server.log.error(err);
       process.exit(1);
