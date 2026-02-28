@@ -11,15 +11,12 @@ import {
   MenuList,
   Text,
   VStack,
+  useColorModeValue,
+  Icon,
 } from '@chakra-ui/react';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-
-export type User = {
-  username: string;
-  role: string;
-  avatarUrl: string;
-};
+import { User } from '../../../app/GlobalState';
 
 export type AuthHeaderProps = {
   user?: User;
@@ -28,39 +25,92 @@ export type AuthHeaderProps = {
 
 const AuthHeaderUI = (props: AuthHeaderProps) => {
   const navigate = useNavigate();
+  const menuBg = useColorModeValue('white', 'gray.800');
+  const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+
   return (
     <HStack position={'relative'} spacing={{ base: '0', md: '6' }}>
       <Flex alignItems={'center'}>
         {props.user ? (
-          <Menu>
+          <Menu gutter={8}>
             <MenuButton
-              py={2}
+              as={Button}
+              variant="ghost"
+              py={4}
+              h="auto"
               transition="all 0.3s"
+              _hover={{ bg: useColorModeValue('gray.50', 'whiteAlpha.100') }}
+              _active={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
               _focus={{ boxShadow: 'none' }}
+              borderRadius="full"
             >
-              <HStack>
-                <Avatar size={'xs'} src={props.user.avatarUrl} />
+              <HStack spacing={3}>
+                <Avatar
+                  size={'sm'}
+                  name={props.user.name}
+                  border="2px solid"
+                  borderColor="brand.400"
+                />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
                   alignItems="flex-start"
-                  spacing="1px"
-                  ml="2"
+                  spacing="0"
+                  ml="1"
                 >
-                  <Text fontSize="sm">{props.user.username}</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    {props.user.role}
+                  <Text fontSize="sm" fontWeight="bold" color={useColorModeValue('gray.700', 'white')}>{props.user.name}</Text>
+                  <Text fontSize="xs" fontWeight="medium" color="gray.500">
+                    {props.user.role === 1 ? 'Administrator' : 'Factory Staff'}
                   </Text>
                 </VStack>
-                <Box display={{ base: 'none', md: 'flex' }}>
+                <Box display={{ base: 'none', md: 'flex' }} color="gray.400">
                   <FiChevronDown />
                 </Box>
               </HStack>
             </MenuButton>
-            <MenuList>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={props.handleSignOut}>Sign out</MenuItem>
+            <MenuList
+              bg={menuBg}
+              shadow="2xl"
+              borderRadius="xl"
+              p={2}
+              border="1px solid"
+              borderColor={useColorModeValue('gray.100', 'gray.700')}
+              zIndex={10}
+            >
+              <MenuItem
+                borderRadius="lg"
+                icon={<Icon as={FiUser} />}
+                _hover={{ bg: hoverBg }}
+                _active={{ bg: hoverBg }}
+                _focus={{ bg: 'transparent' }}
+                fontWeight="medium"
+                mb={1}
+              >
+                Profile
+              </MenuItem>
+              <MenuItem
+                borderRadius="lg"
+                icon={<Icon as={FiSettings} />}
+                _hover={{ bg: hoverBg }}
+                _active={{ bg: hoverBg }}
+                _focus={{ bg: 'transparent' }}
+                fontWeight="medium"
+                mb={1}
+              >
+                Settings
+              </MenuItem>
+              <MenuDivider mx={2} my={2} />
+              <MenuItem
+                borderRadius="lg"
+                icon={<Icon as={FiLogOut} />}
+                color="red.400"
+                _hover={{ bg: 'red.50', color: 'red.600' }}
+                _active={{ bg: 'red.100' }}
+                _focus={{ bg: 'transparent' }}
+                fontWeight="bold"
+                onClick={props.handleSignOut}
+              >
+                Sign out
+              </MenuItem>
             </MenuList>
           </Menu>
         ) : (

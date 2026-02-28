@@ -12,19 +12,22 @@ import {
   Text,
   useColorModeValue,
   Link,
+  FormErrorMessage,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
-export type EmailAndPassword = {
+export type SignUpFormValues = {
+  name: string;
+  employeeId: string;
   email: string;
   password: string;
 };
 
 type SignUpCardProps = {
-  onSubmit(values: EmailAndPassword): void;
+  onSubmit(values: SignUpFormValues): void;
 };
 
 function SignUpCardUI({ onSubmit }: SignUpCardProps) {
@@ -33,7 +36,7 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm<EmailAndPassword>();
+  } = useForm<SignUpFormValues>();
 
   return (
     <Flex
@@ -48,10 +51,7 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
             Sign up
           </Heading>
           <Text fontSize={'lg'} color={'gray.600'}>
-            to enjoy all of our cool features
-            <span role="img" aria-label="peace-emoji">
-              ✌️
-            </span>
+            Join the team
           </Text>
         </Stack>
         <Box
@@ -62,7 +62,27 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={4}>
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={!!errors.name}>
+                <FormLabel htmlFor="name">Full Name</FormLabel>
+                <Input
+                  id="name"
+                  type="text"
+                  {...register('name', { required: 'Name is required' })}
+                />
+                <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+              </FormControl>
+
+              <FormControl isRequired isInvalid={!!errors.employeeId}>
+                <FormLabel htmlFor="employeeId">Employee ID</FormLabel>
+                <Input
+                  id="employeeId"
+                  type="text"
+                  {...register('employeeId', { required: 'Employee ID is required' })}
+                />
+                <FormErrorMessage>{errors.employeeId?.message}</FormErrorMessage>
+              </FormControl>
+
+              <FormControl isRequired isInvalid={!!errors.email}>
                 <FormLabel htmlFor="email">Email address</FormLabel>
                 <Input
                   id="email"
@@ -71,9 +91,11 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
                     required: 'Email is required',
                   })}
                 />
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
               </FormControl>
-              <FormControl isRequired>
-                <FormLabel htmlFor="name">Password</FormLabel>
+
+              <FormControl isRequired isInvalid={!!errors.password}>
+                <FormLabel htmlFor="password">Password</FormLabel>
                 <InputGroup>
                   <Input
                     id="password"
@@ -81,8 +103,8 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
                     {...register('password', {
                       required: 'Password is required',
                       minLength: {
-                        value: 8,
-                        message: 'Minimum length should be 8',
+                        value: 6,
+                        message: 'Minimum length should be 6',
                       },
                     })}
                   />
@@ -97,7 +119,9 @@ function SignUpCardUI({ onSubmit }: SignUpCardProps) {
                     </Button>
                   </InputRightElement>
                 </InputGroup>
+                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
               </FormControl>
+
               <Stack spacing={10} pt={2}>
                 <Button
                   isLoading={isSubmitting}

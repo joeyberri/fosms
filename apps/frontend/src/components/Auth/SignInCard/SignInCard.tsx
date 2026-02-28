@@ -3,8 +3,7 @@ import { trpc } from '@utils/trpc';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { EmailAndPassword } from '../SignUpCard/SignUpCardUI';
-import SignInCardUI from './SignInCardUI';
+import SignInCardUI, { SignInFormValues } from './SignInCardUI';
 
 const SignInCard = () => {
   const state = useGlobalStateStore((state) => state);
@@ -16,27 +15,24 @@ const SignInCard = () => {
   };
 
   const signInMutation = trpc.auth.signIn.useMutation({
-    onSuccess({ email, role, accessToken }) {
-      const avatarUrl =
-        'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9';
+    onSuccess(data) {
       const user = {
-        username: email,
-        role: role,
-        avatarUrl,
+        id: data.id,
+        employeeId: data.employeeId,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        accessToken: data.accessToken,
       };
       state.signIn(user);
       toast.info('Signed in');
-
-      if (rememberMe) {
-        localStorage.setItem('user', JSON.stringify({ ...user, accessToken }));
-      }
       navigate('/');
     },
     onError(error) {
       toast.error(error.message);
     },
   });
-  const onSubmit = (values: EmailAndPassword) => {
+  const onSubmit = (values: SignInFormValues) => {
     signInMutation.mutate(values);
   };
 

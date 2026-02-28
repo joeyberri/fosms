@@ -7,34 +7,49 @@ import { hash, compare } from 'bcryptjs';
 import { Context } from '../../server/context';
 
 type UserResponse = Omit<User, 'password'>;
-type SignUpResult = UserResponse & { accessToken: string };
+type SignInResult = UserResponse & { accessToken: string };
 
 export const signUp = async (
   input: SignUpDto,
   ctx: Context
 ): Promise<UserResponse> => {
+  const existingUser = await ctx.prisma.user.findFirst({
+    where: {
+      OR: [{ email: input.email }, { employeeId: input.employeeId }],
+    },
+  });
+
+  if (existingUser) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'User already exists',
+    });
+  }
+
   const bcryptHash = await hash(input.password, 10);
 
   const user = await ctx.prisma.user.create({
     data: {
+      name: input.name,
+      employeeId: input.employeeId,
       email: input.email,
       password: bcryptHash,
-      role: 'user',
+      role: 0, // Default to Staff
+      department: 'General', // Default department
+      currentShift: 'None', // Default shift
+      status: 'ACTIVE',
     },
   });
-  return {
-    id: user.id,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role: user.role,
-  };
+
+  // Return user without password
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
 };
 
 export const signIn = async (
   input: SignInDto,
   ctx: Context
-): Promise<SignUpResult> => {
+): Promise<SignInResult> => {
   const user = await ctx.prisma.user.findUnique({
     where: {
       email: input.email,
@@ -59,18 +74,17 @@ export const signIn = async (
   const token = sign(
     {
       id: user.id,
-      roles: user.role,
+      email: user.email,
+      role: user.role,
     },
     authConfig.secretKey,
     { expiresIn: authConfig.jwtExpiresIn }
   );
 
+  const { password, ...userWithoutPassword } = user;
+
   return {
-    id: user.id,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role: user.role,
+    ...userWithoutPassword,
     accessToken: token,
   };
 };

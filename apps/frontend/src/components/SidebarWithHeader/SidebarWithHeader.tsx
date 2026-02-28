@@ -27,19 +27,26 @@ import {
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
 import AuthHeader from '../Auth/AuthHeader/AuthHeader';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+
+import { useGlobalStateStore } from '../../app/GlobalState';
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
   path: string;
 }
+
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Home', icon: FiHome, path: '/' },
-  { name: 'Trending', icon: FiTrendingUp, path: '/trending' },
-  { name: 'Explore', icon: FiCompass, path: '/explore' },
-  { name: 'Favourites', icon: FiStar, path: '/favourites' },
-  { name: 'Settings', icon: FiSettings, path: '/settings' },
+  { name: 'Dashboard', icon: FiHome, path: '/' },
+  { name: 'Schedule', icon: FiCompass, path: '/schedule' },
+  { name: 'Swaps', icon: FiTrendingUp, path: '/swaps' },
+];
+
+const AdminLinkItems: Array<LinkItemProps> = [
+  ...LinkItems,
+  { name: 'Manage Users', icon: FiStar, path: '/admin/users' },
+  { name: 'Reports', icon: FiSettings, path: '/admin/reports' },
 ];
 
 export default function SidebarWithHeader({
@@ -81,9 +88,13 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { user } = useGlobalStateStore();
+  const location = useLocation();
+  const items = user?.role === 1 ? AdminLinkItems : LinkItems;
+
   return (
     <Box
-      transition="3s ease"
+      transition="0.3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
@@ -92,17 +103,20 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       h="full"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between" mb={4}>
+        <Text fontSize="2xl" fontWeight="black" bgGradient="linear(to-r, brand.400, brand.600)" bgClip="text" letterSpacing="tight">
+          FOSMS
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon} path={link.path}>
-          {link.name}
-        </NavItem>
-      ))}
+      {items.map((link) => {
+        const isActive = location.pathname === link.path;
+        return (
+          <NavItem key={link.name} icon={link.icon} path={link.path} isActive={isActive}>
+            {link.name}
+          </NavItem>
+        );
+      })}
     </Box>
   );
 };
@@ -111,8 +125,12 @@ interface NavItemProps extends FlexProps {
   icon: IconType;
   children: ReactText;
   path: string;
+  isActive?: boolean;
 }
-const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, children, path, isActive, ...rest }: NavItemProps) => {
+  const activeBg = useColorModeValue('brand.500', 'brand.400');
+  const activeColor = 'white';
+
   return (
     <Link
       as={RouterLink}
@@ -124,23 +142,31 @@ const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
         align="center"
         p="4"
         mx="4"
-        borderRadius="lg"
+        my="1"
+        borderRadius="xl"
         role="group"
         cursor="pointer"
+        bg={isActive ? activeBg : 'transparent'}
+        color={isActive ? activeColor : useColorModeValue('gray.600', 'gray.400')}
+        fontWeight={isActive ? 'bold' : 'medium'}
+        transition="all 0.2s"
+        boxShadow={isActive ? '0 4px 12px rgba(3, 169, 244, 0.3)' : 'none'}
         _hover={{
-          bg: 'cyan.400',
-          color: 'white',
+          bg: isActive ? activeBg : useColorModeValue('gray.50', 'whiteAlpha.100'),
+          color: isActive ? activeColor : useColorModeValue('brand.500', 'brand.300'),
+          transform: 'translateX(5px)',
         }}
         {...rest}
       >
         {icon && (
           <Icon
             mr="4"
-            fontSize="16"
+            fontSize="20"
             _groupHover={{
-              color: 'white',
+              color: isActive ? activeColor : 'brand.500',
             }}
             as={icon}
+            color={isActive ? activeColor : 'inherit'}
           />
         )}
         {children}

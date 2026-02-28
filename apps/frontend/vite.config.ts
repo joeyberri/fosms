@@ -11,9 +11,10 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    tsconfigPaths({ projects: ['./tsconfig.app.json']}),
+    tsconfigPaths({ projects: ['./tsconfig.app.json'] }),
     nxViteTsPaths(),
   ],
+  envDir: '../../',
 
   // Uncomment this if you are using workers.
   // worker: {

@@ -1,35 +1,36 @@
 import SuperJSON from 'superjson';
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { QueryClient } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { trpc } from '../utils/trpc';
+import { useGlobalStateStore } from './GlobalState';
 
 export const useQueryTrpcClient = () => {
   const APP_URL = import.meta.env.VITE_APP_URL;
   if (!APP_URL) throw new Error('No app url env variable found');
 
-  const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() =>
+  const user = useGlobalStateStore((state) => state.user);
+  const accessToken = user?.accessToken;
+
+  const queryClient = useMemo(() => new QueryClient(), []);
+  const trpcClient = useMemo(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
           url: APP_URL,
           headers() {
-            const userJson = localStorage.getItem('user');
-            if (userJson) {
-              const user = JSON.parse(userJson);
-              if (user?.accessToken) {
-                return {
-                  authorization: `Bearer ${user?.accessToken}`,
-                };
-              }
+            if (accessToken) {
+              return {
+                authorization: `Bearer ${accessToken}`,
+              };
             }
             return {};
           },
         }),
       ],
       transformer: SuperJSON,
-    })
+    }),
+    [APP_URL, accessToken]
   );
 
   return { queryClient, trpcClient };

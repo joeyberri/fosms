@@ -13,11 +13,15 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { EmailAndPassword } from '../SignUpCard/SignUpCardUI';
+
+export type SignInFormValues = {
+  email: string;
+  password: string;
+};
 
 type SignInCardProps = {
   rememberMe: boolean;
-  onSubmit(values: EmailAndPassword): void;
+  onSubmit(values: SignInFormValues): void;
   handleRememberMe(value: boolean): void;
 };
 
@@ -30,7 +34,7 @@ function SignInCardUI({
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm<EmailAndPassword>();
+  } = useForm<SignInFormValues>();
 
   return (
     <Flex

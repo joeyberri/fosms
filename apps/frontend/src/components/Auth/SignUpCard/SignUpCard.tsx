@@ -1,7 +1,7 @@
 import { trpc } from '@utils/trpc';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import SignUpCardUI, { EmailAndPassword } from './SignUpCardUI';
+import SignUpCardUI, { SignUpFormValues } from './SignUpCardUI';
 
 const SignUpCard = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const SignUpCard = () => {
       toast.error(error.message);
     },
   });
-  const onSubmit = (values: EmailAndPassword) => {
+  const onSubmit = (values: SignUpFormValues) => {
     signUpMutation.mutate(values);
   };
   return <SignUpCardUI onSubmit={onSubmit} />;

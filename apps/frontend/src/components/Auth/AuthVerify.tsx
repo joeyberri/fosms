@@ -15,26 +15,14 @@ const AuthVerify = () => {
   const location = useLocation();
   const state = useGlobalStateStore((state) => state);
 
-  useEffect(() => {
-    if (state.user) return;
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      if (user?.accessToken && user?.username && user?.role) {
-        state.signIn(user);
-      }
-    }
-  }, [state]);
+  // Removed redundant state hydration
+  // User is loaded synchronously in GlobalState
 
   // Check token expiration
   useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (!userJson) return;
-    const user = JSON.parse(userJson);
-    if (user && user.accessToken) {
-      const decodedJwt = parseJwt(user.accessToken);
-      if (decodedJwt.exp * 1000 < Date.now()) {
-        localStorage.removeItem('user');
+    if (state.user && state.user.accessToken) {
+      const decodedJwt = parseJwt(state.user.accessToken);
+      if (decodedJwt && decodedJwt.exp * 1000 < Date.now()) {
         toast.warning('Your token expired');
         state.signOut();
       }

@@ -26,7 +26,7 @@ const isAuthenticated = t.middleware(({ next, ctx }) => {
 });
 
 const isAdmin = t.middleware(({ next, ctx }) => {
-  if (!ctx.user || ctx.user.role !== 'admin') {
+  if (!ctx.user || ctx.user.role !== 1) {
     throw new TRPCError({ message: 'Unauthorized', code: 'UNAUTHORIZED' });
   }
   return next({

@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 
 export type User = {
-  username: string;
-  role: string;
-  avatarUrl: string;
+  id: string;
+  employeeId: string;
+  name: string;
+  email: string;
+  role: number;
+  accessToken?: string;
 };
 
 export type GlobalState = {
@@ -13,9 +16,27 @@ export type GlobalState = {
   signOut: () => void;
 };
 
-export const useGlobalStateStore = create<GlobalState>((set) => ({
-  user: undefined,
+const getUserFromStorage = (): User | undefined => {
+  try {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      return JSON.parse(userJson);
+    }
+  } catch (e) {
+    console.error('Failed to parse user from storage', e);
+  }
+  return undefined;
+};
 
-  signIn: (user: User) => set((prevState) => ({ ...prevState, user })),
-  signOut: () => set((prevState) => ({ ...prevState, user: undefined })),
+export const useGlobalStateStore = create<GlobalState>((set) => ({
+  user: getUserFromStorage(),
+
+  signIn: (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set((prevState) => ({ ...prevState, user }));
+  },
+  signOut: () => {
+    localStorage.removeItem('user');
+    set((prevState) => ({ ...prevState, user: undefined }));
+  },
 }));
