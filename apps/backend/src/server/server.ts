@@ -5,7 +5,7 @@ import { appRouter } from './router';
 import cors from '@fastify/cors';
 import pretty from 'pino-pretty';
 import pino from 'pino';
-import path from 'path';
+import * as path from 'path';
 import fastifyStatic from '@fastify/static';
 
 export interface ServerOptions {
