@@ -32,16 +32,18 @@ const AuthHeaderUI = (props: AuthHeaderProps) => {
     <HStack position={'relative'} spacing={{ base: '0', md: '6' }}>
       <Flex alignItems={'center'}>
         {props.user ? (
-          <Menu gutter={8}>
+          <Menu gutter={8} autoSelect={false}>
             <MenuButton
               as={Button}
               variant="ghost"
               py={4}
               h="auto"
               transition="all 0.3s"
-              _hover={{ bg: useColorModeValue('gray.50', 'whiteAlpha.100') }}
-              _active={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+              _hover={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+              _active={{ bg: 'transparent' }}
+              _expanded={{ bg: 'transparent' }}
               _focus={{ boxShadow: 'none' }}
+              bg={'transparent'}
               borderRadius="full"
             >
               <HStack spacing={3}>
@@ -79,9 +81,10 @@ const AuthHeaderUI = (props: AuthHeaderProps) => {
               <MenuItem
                 borderRadius="lg"
                 icon={<Icon as={FiUser} />}
-                _hover={{ bg: hoverBg }}
-                _active={{ bg: hoverBg }}
-                _focus={{ bg: 'transparent' }}
+                bg={'transparent'}
+                _hover={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+                _focus={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+                _active={{ bg: 'transparent' }}
                 fontWeight="medium"
                 mb={1}
               >
@@ -90,9 +93,10 @@ const AuthHeaderUI = (props: AuthHeaderProps) => {
               <MenuItem
                 borderRadius="lg"
                 icon={<Icon as={FiSettings} />}
-                _hover={{ bg: hoverBg }}
-                _active={{ bg: hoverBg }}
-                _focus={{ bg: 'transparent' }}
+                bg={'transparent'}
+                _hover={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+                _focus={{ bg: useColorModeValue('gray.100', 'whiteAlpha.200') }}
+                _active={{ bg: 'transparent' }}
                 fontWeight="medium"
                 mb={1}
               >
@@ -103,9 +107,10 @@ const AuthHeaderUI = (props: AuthHeaderProps) => {
                 borderRadius="lg"
                 icon={<Icon as={FiLogOut} />}
                 color="red.400"
-                _hover={{ bg: 'red.50', color: 'red.600' }}
-                _active={{ bg: 'red.100' }}
-                _focus={{ bg: 'transparent' }}
+                bg={'transparent'}
+                _hover={{ bg: 'red.500', color: 'white' }}
+                _focus={{ bg: 'red.500', color: 'white' }}
+                _active={{ bg: 'transparent' }}
                 fontWeight="bold"
                 onClick={props.handleSignOut}
               >
