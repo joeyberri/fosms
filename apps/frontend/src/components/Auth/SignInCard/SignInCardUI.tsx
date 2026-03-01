@@ -19,7 +19,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 import { FiMail, FiLock, FiLogOut } from 'react-icons/fi';
-import bgImage from '../../../assets/auth-bg.png';
+import bgImage from '../../../assets/auth-bg.jpg';
 
 export type SignInFormValues = {
   email: string;
@@ -65,8 +65,6 @@ function SignInCardUI({
           w="full"
           h="full"
           position="absolute"
-          opacity={0.7}
-          filter="brightness(0.6) contrast(1.1)"
         />
         <VStack spacing={6} px={20} zIndex={1} color="white" textAlign="center">
           <Icon as={FiLogOut} w={20} h={20} mb={4} filter="drop-shadow(0 0 20px rgba(0,0,0,0.5))" />
