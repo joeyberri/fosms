@@ -1,13 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient({
-    datasources: {
-        db: {
-            url: 'file:c:/Users/hp/Documents/Redevise/client projects/fosms/apps/backend/prisma/dev.db',
-        },
-    },
-});
+const prisma = new PrismaClient();
 
 async function main() {
     console.log('Seeding database...');

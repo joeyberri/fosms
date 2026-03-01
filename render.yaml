@@ -3,7 +3,7 @@ services:
     name: fosms
     env: node
     plan: free
-    buildCommand: npm install --include=dev --legacy-peer-deps && npx nx build frontend && npx nx build backend && npx prisma generate --schema=apps/backend/prisma/schema.prisma
+    buildCommand: npm install --include=dev --legacy-peer-deps && npx nx build frontend && npx nx build backend && npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss && node apps/backend/seed.js
     startCommand: node dist/apps/backend/main.cjs
     envVars:
       - key: DATABASE_URL

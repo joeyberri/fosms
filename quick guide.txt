@@ -1,0 +1,73 @@
+=======================================================
+          FOSMS - Quick Testing Guide
+=======================================================
+
+Welcome to the Factory Operational Shift Management System (FOSMS). 
+This guide will help you navigate and test the core features of the platform.
+
+-------------------------------------------------------
+1. ACCESSING THE PLATFORM
+-------------------------------------------------------
+URL: [Insert your Render URL here, e.g., https://fosms.onrender.com]
+
+If you are testing locally:
+- Simply double-click 'setup.bat' in the project folder.
+- Once the setup finishes, the app will open in your browser 
+  at http://localhost:3000 (Backend) and http://localhost:5173 (Frontend).
+
+-------------------------------------------------------
+2. TEST CREDENTIALS
+-------------------------------------------------------
+Login with these accounts to see different perspectives:
+
+ADMIN ACCOUNT (Full Control):
+- Email: admin@fosms.com
+- Password: admin123
+
+STAFF ACCOUNT (Personal Dashboard):
+- Email: staff@fosms.com
+- Password: staff123
+
+-------------------------------------------------------
+3. FEATURES TO TEST
+-------------------------------------------------------
+
+### A. DASHBOARD (Admin & Staff)
+- View current shift details and quick statistics.
+- Navigate quickly to the most important sections.
+
+### B. THE SCHEDULE (Staff)
+- Click 'Schedule' in the sidebar.
+- View your upcoming shifts in a calendar format. 
+- You should see the pre-seeded shifts for today and tomorrow.
+
+### C. SHIFT SWAPS (Staff & Admin)
+1. Login as STAFF (staff@fosms.com).
+2. Go to 'Swaps' page.
+3. Submit a 'Request Swap' by choosing a date and a colleague (e.g., Jane Smith).
+4. Logout and Login as ADMIN (admin@fosms.com).
+5. Go to 'Swaps' - you will see the incoming request.
+6. Approve or Reject the request.
+
+### D. USER MANAGEMENT (Admin Only)
+1. Login as ADMIN.
+2. Go to 'Manage Users'.
+3. Click 'Add New User' to provision a new account.
+4. Try searching for existing users using the search bar.
+
+### E. OPERATIONAL REPORTS (Admin Only)
+1. Login as ADMIN.
+2. Go to 'Reports'.
+3. View the 'Shift Distribution' bar chart.
+4. Click 'Export to CSV' to download a data report for external analysis.
+
+-------------------------------------------------------
+4. QUICK TIPS
+-------------------------------------------------------
+- THEMES: The app defaults to a sleek Dark Mode for factory floor visibility.
+- RESPONSIVE: Try resizing your browser; the sidebar will collapse for mobile view.
+- USER MENU: Click the profile name in the top right to access Profile/Settings or to Sign Out.
+
+=======================================================
+Need help? Contact your development lead.
+=======================================================
