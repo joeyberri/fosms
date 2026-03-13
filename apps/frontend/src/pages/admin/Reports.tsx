@@ -1,6 +1,6 @@
 import {
     Box, Table, Thead, Tbody, Tr, Th, Td, Badge, Spinner, Text,
-    Flex, Button, Icon, SimpleGrid, useColorModeValue, Stack, Heading
+    Flex, Button, Icon, SimpleGrid, useColorModeValue, Stack, Heading, Menu, MenuButton, MenuList, MenuItem
 } from '@chakra-ui/react';
 import { trpc } from '../../utils/trpc';
 import { FiDownload, FiBarChart2, FiFileText, FiPrinter } from 'react-icons/fi';
@@ -119,14 +119,19 @@ export default function Reports() {
                 subtitle="Analyze shift distribution and export data."
                 icon={FiBarChart2}
                 rightElement={
-                    <Flex gap={3}>
-                        <Button leftIcon={<FiDownload />} colorScheme="brand" onClick={downloadCSV} shadow="lg">
-                            Export to CSV
-                        </Button>
-                        <Button leftIcon={<FiPrinter />} colorScheme="brand" variant="outline" onClick={downloadPDF} shadow="lg">
-                            Export to PDF
-                        </Button>
-                    </Flex>
+                    <Menu>
+                        <MenuButton as={Button} leftIcon={<FiDownload />} colorScheme="brand" shadow="lg">
+                            Export As
+                        </MenuButton>
+                        <MenuList>
+                            <MenuItem icon={<FiDownload />} onClick={downloadCSV}>
+                                Export to CSV
+                            </MenuItem>
+                            <MenuItem icon={<FiPrinter />} onClick={downloadPDF}>
+                                Export to PDF
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
                 }
             />
 

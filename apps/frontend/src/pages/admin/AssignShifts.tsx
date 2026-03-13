@@ -35,6 +35,7 @@ import {
 import { trpc } from '../../utils/trpc';
 import { useForm, Controller } from 'react-hook-form';
 import { useState, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { FiSearch, FiCalendar, FiClock, FiMapPin, FiPlus } from 'react-icons/fi';
 import { CustomSelect } from '../../components/UI/CustomSelect';
 import { PageHeader } from '../../components/UI/PageHeader';
@@ -60,6 +61,7 @@ export default function AssignShifts() {
     });
 
     const toast = useToast();
+    const queryClient = useQueryClient();
 
     const filteredUsers = useMemo(() => {
         if (!users) return [];
@@ -76,6 +78,9 @@ export default function AssignShifts() {
             reset();
             setSelectedUser(null);
             onClose();
+            // Invalidate queries to refresh the data
+            queryClient.invalidateQueries({ queryKey: trpc.shift.list.getQueryKey() });
+            queryClient.invalidateQueries({ queryKey: trpc.shift.mySchedule.getQueryKey() });
         },
         onError: (e: any) => {
             toast({ title: 'Error assigning shift', description: e.message, status: 'error' });

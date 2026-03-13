@@ -1,6 +1,6 @@
 import {
     Box, Heading, Text, VStack, Spinner, SimpleGrid, Badge, Stack, Button,
-    HStack, IconButton, useColorModeValue, Flex, Stat, StatLabel, StatNumber, StatHelpText, Spacer, Icon
+    HStack, IconButton, useColorModeValue, Flex, Stat, StatLabel, StatNumber, StatHelpText, Spacer, Icon, Table, Thead, Tbody, Tr, Th, Td
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { trpc } from '../utils/trpc';
@@ -156,63 +156,61 @@ function Schedule() {
                         </VStack>
                     </PremiumCard>
                 ) : (
-                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-                        {mySchedule.map((assignment) => (
-                            <PremiumCard key={assignment.id} h="full">
-                                <Stack spacing={4} h="full">
-                                    <Flex justify="space-between" align="center">
-                                        <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.500">
-                                            {new Date(assignment.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                                        </Heading>
-                                        <Badge
-                                            px={3}
-                                            py={1}
-                                            borderRadius="full"
-                                            variant="subtle"
-                                            colorScheme={
-                                                assignment.shiftType === 'Morning' ? 'yellow' :
-                                                    assignment.shiftType === 'Afternoon' ? 'orange' : 'blue'
-                                            }
-                                        >
-                                            {assignment.shiftType}
-                                        </Badge>
-                                    </Flex>
-
-                                    <VStack align="start" spacing={4} flex={1}>
-                                        <VStack align="start" spacing={1}>
-                                            <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase">Time Range</Text>
-                                            <HStack color="gray.700">
-                                                <Icon as={FiClock} w={4} h={4} color="brand.500" />
-                                                <Text fontWeight="bold" fontSize="lg">{assignment.startTime} - {assignment.endTime}</Text>
-                                            </HStack>
-                                        </VStack>
-
-                                        <VStack align="start" spacing={1}>
-                                            <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase">Location</Text>
-                                            <Text fontWeight="semibold" color="gray.600">{assignment.location}</Text>
-                                        </VStack>
-
-                                        {assignment.notes && (
-                                            <Box p={3} bg={noteBg} borderRadius="xl" w="full" border="1px dashed" borderColor="gray.200">
-                                                <Text fontSize="xs" color="gray.500" fontStyle="italic">"{assignment.notes}"</Text>
-                                            </Box>
-                                        )}
-                                    </VStack>
-
-                                    <Button
-                                        size="md"
-                                        variant="outline"
-                                        rightIcon={<FiArrowRight />}
-                                        colorScheme="brand"
-                                        onClick={() => navigate(`/swaps?date=${new Date(assignment.date).toISOString().split('T')[0]}`)}
-                                        _hover={{ bg: 'brand.50', borderColor: 'brand.200' }}
-                                    >
-                                        Request Swap
-                                    </Button>
-                                </Stack>
-                            </PremiumCard>
-                        ))}
-                    </SimpleGrid>
+                    <PremiumCard p={0}>
+                        <Table variant="simple">
+                            <Thead bg={useColorModeValue('gray.50', 'whiteAlpha.50')}>
+                                <Tr>
+                                    <Th>Date</Th>
+                                    <Th>Shift Type</Th>
+                                    <Th>Time</Th>
+                                    <Th>Location</Th>
+                                    <Th>Notes</Th>
+                                    <Th>Actions</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {mySchedule.map((assignment) => (
+                                    <Tr key={assignment.id} _hover={{ bg: useColorModeValue('gray.50', 'whiteAlpha.50') }}>
+                                        <Td fontWeight="medium">
+                                            {new Date(assignment.date).toLocaleDateString(undefined, { 
+                                                weekday: 'short', 
+                                                month: 'short', 
+                                                day: 'numeric' 
+                                            })}
+                                        </Td>
+                                        <Td>
+                                            <Badge
+                                                px={3}
+                                                py={1}
+                                                borderRadius="full"
+                                                variant="subtle"
+                                                colorScheme={
+                                                    assignment.shiftType === 'Morning' ? 'yellow' :
+                                                        assignment.shiftType === 'Afternoon' ? 'orange' : 'blue'
+                                                }
+                                            >
+                                                {assignment.shiftType}
+                                            </Badge>
+                                        </Td>
+                                        <Td fontSize="sm">{assignment.startTime} - {assignment.endTime}</Td>
+                                        <Td fontSize="sm">{assignment.location}</Td>
+                                        <Td fontSize="sm" color="gray.500">{assignment.notes || '-'}</Td>
+                                        <Td>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                rightIcon={<FiArrowRight />}
+                                                colorScheme="brand"
+                                                onClick={() => navigate(`/swaps?date=${new Date(assignment.date).toISOString().split('T')[0]}`)}
+                                            >
+                                                Request Swap
+                                            </Button>
+                                        </Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                    </PremiumCard>
                 )
             ) : (
                 <PremiumCard p={8} className="custom-calendar">
