@@ -144,6 +144,14 @@ export const updateOwnProfile = async (
     input: z.infer<typeof updateUserSchema>,
     ctx: Context
 ) => {
+    // Ensure user is authenticated
+    if (!ctx.user) {
+        throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'You must be logged in to update your profile',
+        });
+    }
+
     // Ensure user can only update their own profile
     if (input.id !== ctx.user.id) {
         throw new TRPCError({
@@ -155,7 +163,7 @@ export const updateOwnProfile = async (
     const { id, ...data } = input;
 
     // Remove role and status fields for security - users shouldn't be able to change these
-    const { role, status, employeeId, ...safeData } = data;
+    const { role, status, ...safeData } = data;
 
     return ctx.prisma.user.update({
         where: { id },

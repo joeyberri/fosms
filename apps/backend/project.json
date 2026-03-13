@@ -14,7 +14,10 @@
         "tsConfig": "apps/backend/tsconfig.app.json",
         "assets": ["apps/backend/src/assets"],
         "generatePackageJson": true,
-        "thirdParty": true
+        "thirdParty": true,
+        "esbuildOptions": {
+          "outfile": "dist/apps/backend/main.js"
+        }
       }
     },
     "serve": {

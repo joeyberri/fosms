@@ -111,17 +111,6 @@ function AdminSwapView() {
                     ))}
                 </Tbody>
             </Table>
-                                {req.status === 'PENDING' && (
-                                    <HStack spacing={2}>
-                                        <IconButton size="sm" icon={<FiCheckCircle />} colorScheme="green" variant="ghost" aria-label="Approve" onClick={() => handleProcess(req.id, 'APPROVED')} />
-                                        <IconButton size="sm" icon={<FiXCircle />} colorScheme="red" variant="ghost" aria-label="Reject" onClick={() => handleProcess(req.id, 'REJECTED')} />
-                                    </HStack>
-                                )}
-                            </Td>
-                        </Tr>
-                    ))}
-                </Tbody>
-            </Table>
             {filteredRequests.length === 0 && (
                 <Box py={10} textAlign="center" color="gray.400">No requests matching filter.</Box>
             )}
