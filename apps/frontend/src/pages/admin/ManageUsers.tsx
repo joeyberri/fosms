@@ -91,7 +91,7 @@ export default function ManageUsers() {
                 }
             />
 
-            <PremiumCard mb={6}>
+            
                 <Stack direction={{ base: 'column', md: 'row' }} spacing={4}>
                     <InputGroup maxW={{ md: 'md' }}>
                         <InputLeftElement pointerEvents="none">
@@ -117,7 +117,7 @@ export default function ManageUsers() {
                         />
                     </Box>
                 </Stack>
-            </PremiumCard>
+            
 
             <PremiumCard p={0}>
                 <Table variant="simple">

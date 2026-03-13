@@ -77,6 +77,8 @@ const Home = () => {
 
   const nextShiftTime = nextShift ? `${nextShift.shiftType} (${nextShift.startTime} - ${nextShift.endTime})` : '';
 
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+
   if (!user) {
     return (
       <Container maxW="container.lg" py={20}>
@@ -89,7 +91,7 @@ const Home = () => {
             <Heading as="h1" size="4xl" mb={4} bgGradient="linear(to-r, brand.400, accent.400)" bgClip="text">
               Precision in Every Shift
             </Heading>
-            <Text fontSize="xl" color="gray.500" maxW="2xl" mx="auto">
+            <Text fontSize="xl" color={secondaryTextColor} maxW="2xl" mx="auto">
               FOSMS streamlines your factory operations, from seamless shift scheduling to instant swap requests.
             </Text>
           </MotionBox>
@@ -185,13 +187,14 @@ const Home = () => {
 };
 
 const StatCard = ({ label, number, help, icon, color }: any) => {
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
   return (
     <PremiumCard h="full">
       <Flex align="center" h="full">
         <Stat>
-          <StatLabel color="gray.500" fontWeight="medium">{label}</StatLabel>
+          <StatLabel color={secondaryTextColor} fontWeight="medium">{label}</StatLabel>
           <StatNumber fontSize="2xl" fontWeight="bold">{number}</StatNumber>
-          <StatHelpText mb={0}>{help}</StatHelpText>
+          <StatHelpText mb={0} color={secondaryTextColor}>{help}</StatHelpText>
         </Stat>
         <Spacer />
         <Icon as={icon} w={8} h={8} color={color || 'brand.500'} opacity={0.3} />
@@ -201,6 +204,7 @@ const StatCard = ({ label, number, help, icon, color }: any) => {
 };
 
 const ActionCard = ({ title, description, buttonText, onClick, color, icon }: any) => {
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
   return (
     <PremiumCard
       whileHover={{ y: -5 }}
@@ -212,7 +216,7 @@ const ActionCard = ({ title, description, buttonText, onClick, color, icon }: an
         <Icon as={icon} w={12} h={12} color={color} mb={2} />
         <Box>
           <Heading size="md" mb={2}>{title}</Heading>
-          <Text color="gray.500">{description}</Text>
+          <Text color={secondaryTextColor}>{description}</Text>
         </Box>
         <Button colorScheme="brand" variant="outline" size="md" onClick={onClick}>
           {buttonText}

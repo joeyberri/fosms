@@ -91,10 +91,10 @@ export const listSwapRequests = async (ctx: Context) => {
         },
         include: {
             user: {
-                select: { name: true, employeeId: true },
+                select: { name: true, employeeId: true, department: true },
             },
             colleague: {
-                select: { name: true, employeeId: true },
+                select: { name: true, employeeId: true, department: true },
             },
         },
     });
@@ -110,10 +110,10 @@ export const getMySwapRequests = async (userId: string, ctx: Context) => {
         },
         include: {
             user: {
-                select: { name: true, employeeId: true },
+                select: { name: true, employeeId: true, department: true },
             },
             colleague: {
-                select: { name: true, employeeId: true },
+                select: { name: true, employeeId: true, department: true },
             },
         },
     });
