@@ -3,16 +3,17 @@ import {
     Flex, Button, Icon, SimpleGrid, useColorModeValue, Stack, Heading
 } from '@chakra-ui/react';
 import { trpc } from '../../utils/trpc';
-import { FiDownload, FiBarChart2, FiFileText } from 'react-icons/fi';
+import { FiDownload, FiBarChart2, FiFileText, FiPrinter } from 'react-icons/fi';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { PageHeader } from '../../components/UI/PageHeader';
 import { PremiumCard } from '../../components/UI/PremiumCard';
 
 export default function Reports() {
     const { data: shifts, isLoading } = trpc.shift.list.useQuery();
+    const printRef = useRef<HTMLDivElement>(null);
 
     const chartData = useMemo(() => {
         if (!shifts) return [];
@@ -46,6 +47,67 @@ export default function Reports() {
         a.click();
     };
 
+    const downloadPDF = () => {
+        if (!printRef.current) return;
+        
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+        
+        const headers = ['Date', 'Staff', 'Type', 'Start', 'End', 'Location'];
+        const rows = shifts ? shifts.map(s => [
+            new Date(s.date).toLocaleDateString(),
+            s.user?.name || s.userId,
+            s.shiftType,
+            s.startTime,
+            s.endTime,
+            s.location
+        ]) : [];
+        
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>FOSMS Shift Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; }
+                    p { color: #666; margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                    th { background-color: #4299E1; color: white; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                </style>
+            </head>
+            <body>
+                <h1>FOSMS Operational Report</h1>
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>Total Shifts:</strong> ${shifts?.length || 0}</p>
+                
+                <h2>Shift Distribution</h2>
+                <p>Morning: ${chartData.find(d => d.name === 'Morning')?.count || 0}, Afternoon: ${chartData.find(d => d.name === 'Afternoon')?.count || 0}, Night: ${chartData.find(d => d.name === 'Night')?.count || 0}</p>
+                
+                <h2>Detailed Shift Logs</h2>
+                <table>
+                    <thead>
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Delay to ensure content loads
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
+    };
+
     if (isLoading) return <Box py={20} textAlign="center"><Spinner size="xl" color="brand.500" thickness="4px" /></Box>;
 
     const COLORS = ['#ECC94B', '#ED8936', '#4299E1'];
@@ -57,9 +119,14 @@ export default function Reports() {
                 subtitle="Analyze shift distribution and export data."
                 icon={FiBarChart2}
                 rightElement={
-                    <Button leftIcon={<FiDownload />} colorScheme="brand" onClick={downloadCSV} shadow="lg">
-                        Export to CSV
-                    </Button>
+                    <Flex gap={3}>
+                        <Button leftIcon={<FiDownload />} colorScheme="brand" onClick={downloadCSV} shadow="lg">
+                            Export to CSV
+                        </Button>
+                        <Button leftIcon={<FiPrinter />} colorScheme="brand" variant="outline" onClick={downloadPDF} shadow="lg">
+                            Export to PDF
+                        </Button>
+                    </Flex>
                 }
             />
 

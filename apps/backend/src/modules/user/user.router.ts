@@ -1,6 +1,6 @@
 import { router, procedure, adminProcedure } from '../../server/trpc';
 import { createUserSchema, updateUserSchema } from './user.dtos';
-import { createUser, getUser, listUsers, updateUser } from './user.service';
+import { createUser, getUser, listUsers, updateUser, deleteUser, updateOwnProfile } from './user.service';
 import { z } from 'zod';
 
 export const userRouter = router({
@@ -30,5 +30,17 @@ export const userRouter = router({
         .input(updateUserSchema)
         .mutation(async ({ input, ctx }) => {
             return updateUser(input, ctx);
+        }),
+
+    delete: adminProcedure
+        .input(z.string())
+        .mutation(async ({ input, ctx }) => {
+            return deleteUser(input, ctx);
+        }),
+
+    updateProfile: procedure
+        .input(updateUserSchema)
+        .mutation(async ({ input, ctx }) => {
+            return updateOwnProfile(input, ctx);
         }),
 });

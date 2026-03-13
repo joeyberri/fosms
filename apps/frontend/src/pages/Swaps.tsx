@@ -80,6 +80,7 @@ function AdminSwapView() {
                         <Th>Date</Th>
                         <Th>Requester</Th>
                         <Th>Type</Th>
+                        <Th>Reason</Th>
                         <Th>Colleague</Th>
                         <Th>Status</Th>
                         <Th>Actions</Th>
@@ -93,11 +94,23 @@ function AdminSwapView() {
                             <Td>
                                 <Text fontSize="xs" color="gray.500">{req.currentShift} → {req.requestedShift}</Text>
                             </Td>
+                            <Td fontSize="sm" color="gray.600">{req.reason || '-'}</Td>
                             <Td>{req.colleague?.name || 'Open Request'}</Td>
                             <Td>
                                 <StatusBadge status={req.status} />
                             </Td>
                             <Td>
+                                {req.status === 'PENDING' && (
+                                    <HStack spacing={2}>
+                                        <IconButton size="sm" icon={<FiCheckCircle />} colorScheme="green" variant="ghost" aria-label="Approve" onClick={() => handleProcess(req.id, 'APPROVED')} />
+                                        <IconButton size="sm" icon={<FiXCircle />} colorScheme="red" variant="ghost" aria-label="Reject" onClick={() => handleProcess(req.id, 'REJECTED')} />
+                                    </HStack>
+                                )}
+                            </Td>
+                        </Tr>
+                    ))}
+                </Tbody>
+            </Table>
                                 {req.status === 'PENDING' && (
                                     <HStack spacing={2}>
                                         <IconButton size="sm" icon={<FiCheckCircle />} colorScheme="green" variant="ghost" aria-label="Approve" onClick={() => handleProcess(req.id, 'APPROVED')} />
@@ -277,6 +290,7 @@ function MyRequestsList({ userId }: { userId: string }) {
                     <Tr>
                         <Th>Date</Th>
                         <Th>Details</Th>
+                        <Th>Reason</Th>
                         <Th>Target Person</Th>
                         <Th>Status</Th>
                     </Tr>
@@ -288,6 +302,7 @@ function MyRequestsList({ userId }: { userId: string }) {
                             <Td>
                                 <Text fontSize="sm">{req.currentShift} → {req.requestedShift}</Text>
                             </Td>
+                            <Td fontSize="sm" color="gray.600">{req.reason || '-'}</Td>
                             <Td>{req.colleague?.name || 'General Request'}</Td>
                             <Td>
                                 <StatusBadge status={req.status} />
@@ -295,7 +310,7 @@ function MyRequestsList({ userId }: { userId: string }) {
                         </Tr>
                     ))}
                     {(!myRequests || myRequests.length === 0) && (
-                        <Tr><Td colSpan={4} textAlign="center" py={10} color="gray.500">No requests found.</Td></Tr>
+                        <Tr><Td colSpan={5} textAlign="center" py={10} color="gray.500">No requests found.</Td></Tr>
                     )}
                 </Tbody>
             </Table>

@@ -16,13 +16,14 @@ import {
   Flex,
   Spacer
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useGlobalStateStore } from '../app/GlobalState';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiCalendar, FiRefreshCw, FiUsers, FiBarChart2, FiClock, FiSettings } from 'react-icons/fi';
 import { PageHeader } from '../components/UI/PageHeader';
 import { PremiumCard } from '../components/UI/PremiumCard';
+import { trpc } from '../utils/trpc';
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -31,6 +32,50 @@ const Home = () => {
   const { user } = useGlobalStateStore();
   const navigate = useNavigate();
   const accentColor = useColorModeValue('brand.500', 'brand.300');
+
+  // Fetch real data
+  const { data: mySchedule } = trpc.shift.mySchedule.useQuery();
+  const { data: mySwapRequests } = trpc.shift.mySwapRequests.useQuery();
+  const { data: colleagues } = trpc.user.listColleagues.useQuery();
+
+  // Calculate next shift
+  const nextShift = useMemo(() => {
+    if (!mySchedule || mySchedule.length === 0) return null;
+    const now = new Date();
+    return mySchedule
+      .filter(s => new Date(s.date) >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+  }, [mySchedule]);
+
+  // Calculate pending swaps
+  const pendingSwaps = useMemo(() => {
+    if (!mySwapRequests) return 0;
+    return mySwapRequests.filter(r => r.status === 'PENDING').length;
+  }, [mySwapRequests]);
+
+  // Calculate team members count
+  const teamMembersCount = useMemo(() => {
+    if (!colleagues) return 0;
+    return colleagues.length;
+  }, [colleagues]);
+
+  // Get unique departments
+  const departmentsCount = useMemo(() => {
+    if (!colleagues) return 0;
+    const uniqueDepts = new Set(colleagues.map(c => c.department));
+    return uniqueDepts.size;
+  }, [colleagues]);
+
+  // Format next shift date
+  const nextShiftDisplay = useMemo(() => {
+    if (!nextShift) return 'No upcoming shifts';
+    const date = new Date(nextShift.date);
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${dayName}, ${monthDay}`;
+  }, [nextShift]);
+
+  const nextShiftTime = nextShift ? `${nextShift.shiftType} (${nextShift.startTime} - ${nextShift.endTime})` : '';
 
   if (!user) {
     return (
@@ -109,9 +154,9 @@ const Home = () => {
       />
 
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={10}>
-        <StatCard label="My Next Shift" number="Mon, Oct 24" help="Morning (08:00 - 16:00)" icon={FiCalendar} />
-        <StatCard label="Pending Swaps" number="3" help="2 outgoing, 1 incoming" icon={FiRefreshCw} />
-        <StatCard label="Team Members" number="24" help="Across 4 departments" icon={FiUsers} />
+        <StatCard label="My Next Shift" number={nextShiftDisplay} help={nextShiftTime || 'Loading...'} icon={FiCalendar} />
+        <StatCard label="Pending Swaps" number={pendingSwaps.toString()} help={pendingSwaps === 1 ? '1 swap request' : `${pendingSwaps} swap requests`} icon={FiRefreshCw} />
+        <StatCard label="Team Members" number={teamMembersCount.toString()} help={departmentsCount === 1 ? `${departmentsCount} department` : `${departmentsCount} departments`} icon={FiUsers} />
         {user.role === 1 && <StatCard label="System Alerts" number="0" help="All systems operational" icon={FiBarChart2} color="green.500" />}
       </SimpleGrid>
 
@@ -123,14 +168,6 @@ const Home = () => {
           onClick={() => navigate('/schedule')}
           color="brand.500"
           icon={FiCalendar}
-        />
-        <ActionCard
-          title="Shift Swap Center"
-          description="Request a trade or respond to pending swap invites."
-          buttonText="Manage Swaps"
-          onClick={() => navigate('/swaps')}
-          color="orange.400"
-          icon={FiRefreshCw}
         />
         {user.role === 1 && (
           <ActionCard

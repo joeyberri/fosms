@@ -3,12 +3,13 @@ import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton,
     FormControl, FormLabel, Input, Stack, useToast, Spinner, Badge,
     Flex, InputGroup, InputLeftElement, Icon, HStack, Text, useColorModeValue,
-    VStack, Heading
+    VStack, Heading, IconButton, AlertDialog, AlertDialogOverlay, AlertDialogContent,
+    AlertDialogHeader, AlertDialogBody, AlertDialogFooter
 } from '@chakra-ui/react';
 import { trpc } from '../../utils/trpc';
 import { useForm, Controller } from 'react-hook-form';
-import { useState, useMemo } from 'react';
-import { FiSearch, FiUserPlus, FiUser, FiHash, FiShield, FiBriefcase, FiCheckCircle, FiUsers } from 'react-icons/fi';
+import { useState, useMemo, useRef } from 'react';
+import { FiSearch, FiUserPlus, FiUser, FiHash, FiShield, FiBriefcase, FiCheckCircle, FiUsers, FiTrash2 } from 'react-icons/fi';
 import { CustomSelect } from '../../components/UI/CustomSelect';
 import { PageHeader } from '../../components/UI/PageHeader';
 import { PremiumCard } from '../../components/UI/PremiumCard';
@@ -16,8 +17,11 @@ import { PremiumCard } from '../../components/UI/PremiumCard';
 export default function ManageUsers() {
     const { data: users, isLoading, refetch } = trpc.user.list.useQuery();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState<'ALL' | 'ADMIN' | 'STAFF'>('ALL');
+    const [userToDelete, setUserToDelete] = useState<any>(null);
+    const cancelRef = useRef(null);
 
     // Form handling for the modal
     const { register, handleSubmit, reset, control } = useForm();
@@ -48,6 +52,29 @@ export default function ManageUsers() {
             toast({ title: 'Error creating user', description: e.message, status: 'error' });
         }
     });
+
+    const deleteUserMutation = trpc.user.delete.useMutation({
+        onSuccess: () => {
+            toast({ title: 'User removed successfully', status: 'success' });
+            refetch();
+            onDeleteClose();
+            setUserToDelete(null);
+        },
+        onError: (e: any) => {
+            toast({ title: 'Error removing user', description: e.message, status: 'error' });
+        }
+    });
+
+    const handleDeleteClick = (user: any) => {
+        setUserToDelete(user);
+        onDeleteOpen();
+    };
+
+    const handleConfirmDelete = () => {
+        if (userToDelete) {
+            deleteUserMutation.mutate(userToDelete.id);
+        }
+    };
 
     if (isLoading) return <Box py={20} textAlign="center"><Spinner size="xl" color="brand.500" thickness="4px" /></Box>;
 
@@ -101,6 +128,7 @@ export default function ManageUsers() {
                             <Th><HStack spacing={1}><Icon as={FiBriefcase} /> <Text>Dept</Text></HStack></Th>
                             <Th><HStack spacing={1}><Icon as={FiShield} /> <Text>Role</Text></HStack></Th>
                             <Th>Status</Th>
+                            <Th>Actions</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -124,6 +152,16 @@ export default function ManageUsers() {
                                         <Icon as={FiCheckCircle} color="green.500" />
                                         <Text fontSize="xs" fontWeight="bold" color="green.500">{user.status}</Text>
                                     </HStack>
+                                </Td>
+                                <Td>
+                                    <IconButton
+                                        icon={<FiTrash2 />}
+                                        colorScheme="red"
+                                        variant="ghost"
+                                        size="sm"
+                                        aria-label="Delete user"
+                                        onClick={() => handleDeleteClick(user)}
+                                    />
                                 </Td>
                             </Tr>
                         ))}
@@ -195,6 +233,31 @@ export default function ManageUsers() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
+
+            <AlertDialog
+                isOpen={isDeleteOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onDeleteClose}
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Remove Personnel
+                        </AlertDialogHeader>
+                        <AlertDialogBody>
+                            Are you sure you want to remove <strong>{userToDelete?.name}</strong> ({userToDelete?.employeeId})? This action cannot be undone.
+                        </AlertDialogBody>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onDeleteClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={handleConfirmDelete} ml={3} isLoading={deleteUserMutation.isLoading}>
+                                Remove
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Box >
     );
 }

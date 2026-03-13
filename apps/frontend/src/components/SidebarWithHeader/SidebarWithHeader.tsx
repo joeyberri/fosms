@@ -23,6 +23,8 @@ import {
   FiSettings,
   FiMenu,
   FiBell,
+  FiCalendar,
+  FiUser,
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
@@ -41,11 +43,13 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Dashboard', icon: FiHome, path: '/' },
   { name: 'Schedule', icon: FiCompass, path: '/schedule' },
   { name: 'Swaps', icon: FiTrendingUp, path: '/swaps' },
+  { name: 'Profile', icon: FiUser, path: '/profile' },
 ];
 
 const AdminLinkItems: Array<LinkItemProps> = [
   ...LinkItems,
   { name: 'Manage Users', icon: FiStar, path: '/admin/users' },
+  { name: 'Assign Shifts', icon: FiCalendar, path: '/admin/assign-shifts' },
   { name: 'Reports', icon: FiSettings, path: '/admin/reports' },
 ];
 

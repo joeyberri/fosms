@@ -13,7 +13,9 @@ import { Heading, Box } from '@chakra-ui/react';
 import Home from '../pages/Home';
 import Schedule from '../pages/Schedule';
 import Swaps from '../pages/Swaps';
+import Profile from '../pages/Profile';
 import ManageUsers from '../pages/admin/ManageUsers';
+import AssignShifts from '../pages/admin/AssignShifts';
 import Reports from '../pages/admin/Reports';
 
 export function App() {
@@ -39,7 +41,9 @@ export function App() {
             <Route path="/" element={<Home />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/swaps" element={<Swaps />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/admin/users" element={<ManageUsers />} />
+            <Route path="/admin/assign-shifts" element={<AssignShifts />} />
             <Route path="/admin/reports" element={<Reports />} />
           </Route>
 

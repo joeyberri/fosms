@@ -119,3 +119,58 @@ export const updateUser = async (
         },
     });
 };
+
+export const deleteUser = async (id: string, ctx: Context) => {
+    const user = await ctx.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+        throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'User not found',
+        });
+    }
+
+    return ctx.prisma.user.delete({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            employeeId: true,
+        },
+    });
+};
+
+export const updateOwnProfile = async (
+    input: z.infer<typeof updateUserSchema>,
+    ctx: Context
+) => {
+    // Ensure user can only update their own profile
+    if (input.id !== ctx.user.id) {
+        throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'You can only update your own profile',
+        });
+    }
+
+    const { id, ...data } = input;
+
+    // Remove role and status fields for security - users shouldn't be able to change these
+    const { role, status, employeeId, ...safeData } = data;
+
+    return ctx.prisma.user.update({
+        where: { id },
+        data: safeData,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            employeeId: true,
+            department: true,
+            currentShift: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+    });
+};
