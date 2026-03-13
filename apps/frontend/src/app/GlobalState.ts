@@ -6,12 +6,16 @@ export type User = {
   name: string;
   email: string;
   role: number;
+  department?: string;
+  currentShift?: string;
+  status?: string;
   accessToken?: string;
 };
 
 export type GlobalState = {
   user?: User;
 
+  setUser: (user: User) => void;
   signIn: (user: User) => void;
   signOut: () => void;
 };
@@ -30,6 +34,11 @@ const getUserFromStorage = (): User | undefined => {
 
 export const useGlobalStateStore = create<GlobalState>((set) => ({
   user: getUserFromStorage(),
+
+  setUser: (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
+  },
 
   signIn: (user: User) => {
     localStorage.setItem('user', JSON.stringify(user));
