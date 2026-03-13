@@ -108,7 +108,7 @@ const ScheduleListGroup = ({ date, shifts, isArchived = false }: { date: string,
                                             variant="ghost"
                                             rightIcon={<FiArrowRight />}
                                             colorScheme="brand"
-                                            onClick={() => navigate(`/swaps?date=${s.date.split('T')[0]}`)}
+                                            onClick={() => navigate(`/swaps?date=${new Date(s.date).toISOString().split('T')[0]}`)}
                                         >
                                             Swap
                                         </Button>
