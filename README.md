@@ -1,16 +1,3 @@
-# Full stack starter template
-
-Monorepository TypeScript template for full stack applications.
-
-- Maximized for productivity
-- Based on cutting edge technologies
-- Follows best practices for project structure, architecture, security
-- Includes authentication module
-
-## Libraries/frameworks
-
-This template includes a bunch of libraries to get you up and running quickly and improve your developer experience.
-
 ### Frontend
 
 - [React](https://reactjs.org/) - main frontend library
@@ -45,6 +32,15 @@ This template includes a bunch of libraries to get you up and running quickly an
 
 ## Starting the app
 
+### For Windows Users (Recommended for Non-Techies)
+If you're on Windows and prefer simple scripts:
+
+1. Clone the repository
+2. Run `setup.bat` - This will set up the environment, install dependencies, start Docker, and run migrations
+3. Run `start.bat` - This will start the backend and frontend servers in separate windows
+4. (Optional) Run `db.bat` - This will open Prisma Studio to view and edit database tables
+
+### Manual Setup (All Platforms)
 - Clone the repository
 - Copy `.env.example` and rename to `.env`
 - `npm run docker:env` - setup the database (postgresql) in docker
@@ -53,15 +49,3 @@ This template includes a bunch of libraries to get you up and running quickly an
 - `npm run backend:dev` - run backend
 - `npm run frontend:dev` - run frontend
 
-## Scripts
-
-- `npm run frontend:storybook` - start storybook to develop components in isolation
-- `npm run dep-graph` - see dependency graph
-- For more commands check `package.json`
-- To generate new apps in the monorepo, check out [NX documentation](https://nx.dev/packages/nx/documents/generate).
-
-## Check out my other repositories
-
-- [Domain-Driven Hexagon](https://github.com/Sairyss/domain-driven-hexagon) - Guide on Domain-Driven Design, software architecture, design patterns, best practices etc.
-- [Backend best practices](https://github.com/Sairyss/backend-best-practices) - Best practices, tools and guidelines for backend development.
-- [System Design Patterns](https://github.com/Sairyss/system-design-patterns) - list of topics and resources related to distributed systems, system design, microservices, scalability and performance, etc.
