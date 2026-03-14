@@ -1,23 +1,15 @@
 @echo off
 setlocal
 echo =======================================================
-echo          FOSMS Project Setup and Run Script
+echo          FOSMS Project Setup Script
 echo =======================================================
 
-:: Check for Git
-where git >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Git is not installed or not in PATH.
-    echo Please install Git and try again.
-    pause
-    exit /b 1
-)
-
-:: Check for Node.js
+:: Check for Node.js and npm
 where npm >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Node.js is not installed or not in PATH.
-    echo Please install Node.js and try again.
+    echo [ERROR] Node.js/npm is not installed or not in PATH.
+    echo Please download and install Node.js from https://nodejs.org/
+    echo Then run this script again.
     pause
     exit /b 1
 )
@@ -26,30 +18,17 @@ if %ERRORLEVEL% NEQ 0 (
 where docker >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Docker is not installed or not in PATH.
-    echo Please install Docker Desktop, start it, and try again.
+    echo Please install Docker Desktop from https://www.docker.com/products/docker-desktop
+    echo Start Docker Desktop and try again.
     pause
     exit /b 1
-)
-
-:: Clone or Enter Repo
-if exist "package.json" (
-    echo Found package.json. Assuming we are inside the project folder.
-) else (
-    echo Cloning the project repository...
-    git clone https://github.com/Sairyss/fullstack-starter-template.git fosms-app
-    if %ERRORLEVEL% NEQ 0 (
-        echo [ERROR] Git clone failed. Check your internet connection or git installation.
-        pause
-        exit /b 1
-    )
-    cd fosms-app
 )
 
 :: Handle Environment Variables
 echo Setting up environment variables...
 if not exist ".env" (
     if exist ".env.example" (
-        copy .env.example .env >nul
+        copy ".env.example" ".env" >nul
         echo Configured root .env
     )
 )
@@ -57,7 +36,7 @@ if not exist ".env" (
 if not exist "apps\backend\.env" (
     if exist ".env" (
         if not exist "apps\backend" mkdir apps\backend
-        copy .env apps\backend\.env >nul
+        copy .env "apps\backend\.env" >nul
         echo Configured backend .env
     )
 )
@@ -98,6 +77,16 @@ if %ERRORLEVEL% NEQ 0 (
 if exist "apps\backend\seed.js" (
     echo Seeding database...
     node apps\backend\seed.js
+    if %ERRORLEVEL% NEQ 0 (
+        echo [WARNING] Seeding failed, but continuing...
+    )
+)
+
+echo =======================================================
+echo          Setup Complete!
+echo =======================================================
+echo You can now run start.bat to start the project or db.bat to view the database.
+pause
 )
 
 :: Starting App
