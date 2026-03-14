@@ -7,21 +7,18 @@ echo =======================================================
 :: Check for Node.js and npm
 where npm >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Node.js/npm is not installed or not in PATH.
-    echo Please download and install Node.js from https://nodejs.org/
-    echo Then run this script again.
-    pause
-    exit /b 1
-)
-
-:: Check for Docker
-where docker >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Docker is not installed or not in PATH.
-    echo Please install Docker Desktop from https://www.docker.com/products/docker-desktop
-    echo Start Docker Desktop and try again.
-    pause
-    exit /b 1
+    echo Node.js not found. Downloading and installing Node.js...
+    powershell -Command "try { Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.11.0/node-v20.11.0-x64.msi' -OutFile '$env:TEMP\nodejs.msi'; Start-Process msiexec.exe -ArgumentList '/i', '$env:TEMP\nodejs.msi', '/quiet', '/norestart' -Wait; } catch { echo Failed to download/install Node.js. Please install manually from https://nodejs.org/; pause; exit /b 1 }"
+    :: Update PATH for this session
+    set PATH=%PATH%;C:\Program Files\nodejs
+    :: Check again
+    where npm >nul 2>nul
+    if %ERRORLEVEL% NEQ 0 (
+        echo [ERROR] Node.js installation failed. Please install Node.js manually.
+        pause
+        exit /b 1
+    )
+    echo Node.js installed successfully.
 )
 
 :: Handle Environment Variables
@@ -50,25 +47,11 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-:: Docker up
-echo Starting Database Docker container...
-call docker compose -f docker\docker-compose.yaml up -d
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Failed to start Docker container. Make sure Docker Desktop is open!
-    pause
-    exit /b 1
-)
-
-:: Adding wait time for db startup
-echo Waiting for the database to accept connections...
-timeout /t 5 /nobreak >nul
-
-:: Database Migration
+:: Database Migration (SQLite, no server needed)
 echo Running database migrations...
 call npm run migrate:dev
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Database migration failed.
-    echo You may need to restart the script after Docker finishes starting.
     pause
     exit /b 1
 )
@@ -87,17 +70,6 @@ echo          Setup Complete!
 echo =======================================================
 echo You can now run start.bat to start the project or db.bat to view the database.
 pause
-)
-
-:: Starting App
-echo =======================================================
-echo          Setup Complete! Application is starting...     
-echo =======================================================
-echo Local apps should open in your browser or be available at:
-echo Frontend: Varies based on Vite config, usually http://localhost:4200
-echo Backend:  http://localhost:3000
-echo.
-echo Leave this window open to keep servers running!
 echo To shut down, press Ctrl+C multiple times in this window.
 
 :: Actually start the Nx dev server

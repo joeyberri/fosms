@@ -36,16 +36,18 @@
 If you're on Windows and prefer simple scripts:
 
 1. Clone the repository
-2. Run `setup.bat` - This will set up the environment, install dependencies, start Docker, and run migrations
+2. Run `setup.bat` - This will automatically download and install Node.js if needed, install dependencies, and setup the SQLite database
 3. Run `start.bat` - This will start the backend and frontend servers in separate windows
 4. (Optional) Run `db.bat` - This will open Prisma Studio to view and edit database tables
 
+**Note:** The app uses SQLite (file-based database), so no additional database setup is required!
+
 ### Manual Setup (All Platforms)
 - Clone the repository
+- Install Node.js from https://nodejs.org/ if not already installed
 - Copy `.env.example` and rename to `.env`
-- `npm run docker:env` - setup the database (postgresql) in docker
 - `npm install` - install dependencies
-- `npm run migrate:dev` - run migrations to create tables
+- `npm run migrate:dev` - run migrations to create tables (uses SQLite)
 - `npm run backend:dev` - run backend
 - `npm run frontend:dev` - run frontend
 

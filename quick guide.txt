@@ -67,7 +67,3 @@ STAFF ACCOUNT (Personal Dashboard):
 - THEMES: The app defaults to a sleek Dark Mode for factory floor visibility.
 - RESPONSIVE: Try resizing your browser; the sidebar will collapse for mobile view.
 - USER MENU: Click the profile name in the top right to access Profile/Settings or to Sign Out.
-
-=======================================================
-Need help? Contact your development lead.
-=======================================================
