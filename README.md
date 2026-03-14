@@ -32,8 +32,8 @@
 
 ## Starting the app
 
-### For Windows Users (Recommended for Non-Techies)
-If you're on Windows and prefer simple scripts:
+### For Windows Users
+If you're on Windows:
 
 1. Clone the repository
 2. Run `setup.bat` - This will automatically download and install Node.js if needed, install dependencies, and setup the SQLite database
