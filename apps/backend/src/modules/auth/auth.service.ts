@@ -71,15 +71,19 @@ export const signIn = async (
     throw error;
   }
 
+  // --- TYPE FIX APPLIED HERE ---
   const token = sign(
     {
       id: user.id,
       email: user.email,
       role: user.role,
     },
-    authConfig.secretKey,
-    { expiresIn: authConfig.jwtExpiresIn }
+    authConfig.secretKey as string, 
+    { 
+      expiresIn: authConfig.jwtExpiresIn as any 
+    }
   );
+  // -----------------------------
 
   const { password, ...userWithoutPassword } = user;
 
