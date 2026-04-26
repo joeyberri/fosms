@@ -5,15 +5,17 @@ import {
     ModalCloseButton, FormControl, FormLabel, Input, Stack,
     useToast, Spinner, Badge, Flex, InputGroup, InputLeftElement,
     Icon, HStack, Text, useColorModeValue, VStack, Heading, Select,
-    IconButton, Collapse, Divider, Center, useBoolean
+    IconButton, Collapse, Divider, Center, useBoolean, Tooltip
 } from '@chakra-ui/react';
+
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
     FiSearch, FiCalendar, FiClock, FiMapPin, 
     FiPlus, FiUser, FiX, FiArchive, 
-    FiChevronDown, FiChevronUp 
+    FiChevronDown, FiChevronUp, FiBell 
 } from 'react-icons/fi';
+
 
 // Internal Utils & Components
 import { trpc } from '../../utils/trpc';
@@ -44,7 +46,7 @@ interface Shift {
 
 interface ShiftFormValues {
     userId: string;
-    shiftType: 'Morning' | 'Afternoon' | 'Night' | 'Custom';
+    shiftType: 'Morning' | 'Afternoon' | 'Night' | 'OFF_DAY' | 'Custom';
     date: string;
     startTime: string;
     endTime: string;
@@ -56,14 +58,28 @@ const SHIFT_PRESETS = {
     Morning: { start: '06:00', end: '14:00' },
     Afternoon: { start: '14:00', end: '22:00' },
     Night: { start: '22:00', end: '06:00' },
+    OFF_DAY: { start: '00:00', end: '00:00' },
     Custom: { start: '', end: '' }
 };
+
 
 /**
  * Sub-component: Shift Table Group
  */
-const ShiftDateGroup = ({ date, shifts, isArchived = false }: { date: string, shifts: Shift[], isArchived?: boolean }) => {
+const ShiftDateGroup = ({ 
+    date, 
+    shifts, 
+    isArchived = false, 
+    onTriggerReminder 
+}: { 
+    date: string, 
+    shifts: Shift[], 
+    isArchived?: boolean, 
+    onTriggerReminder: (id: string) => void 
+}) => {
+
     const headerBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+    const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
     
     return (
         <Box mb={4}>
@@ -80,11 +96,13 @@ const ShiftDateGroup = ({ date, shifts, isArchived = false }: { date: string, sh
                             <Th><FiClock style={{ display: 'inline', marginRight: '4px' }} /> Time</Th>
                             <Th><FiMapPin style={{ display: 'inline', marginRight: '4px' }} /> Location</Th>
                             <Th>Notes</Th>
+                            <Th textAlign="right">Actions</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         {shifts.map((shift) => (
-                            <Tr key={shift.id} _hover={{ bg: useColorModeValue('gray.50', 'whiteAlpha.50') }}>
+                            <Tr key={shift.id} _hover={{ bg: hoverBg }}>
+
                                 <Td py={4}>
                                     <VStack align="start" spacing={0}>
                                         <Text fontWeight="bold" fontSize="sm">{shift.user?.name}</Text>
@@ -93,7 +111,7 @@ const ShiftDateGroup = ({ date, shifts, isArchived = false }: { date: string, sh
                                 </Td>
                                 <Td>
                                     <Badge 
-                                        colorScheme={shift.shiftType === 'Morning' ? 'yellow' : shift.shiftType === 'Afternoon' ? 'orange' : 'blue'} 
+                                        colorScheme={shift.shiftType === 'Morning' ? 'yellow' : shift.shiftType === 'Afternoon' ? 'orange' : shift.shiftType === 'OFF_DAY' ? 'green' : 'blue'} 
                                         borderRadius="full" px={2}
                                     >
                                         {shift.shiftType}
@@ -102,9 +120,23 @@ const ShiftDateGroup = ({ date, shifts, isArchived = false }: { date: string, sh
                                 <Td fontWeight="medium" fontSize="xs">{shift.startTime} - {shift.endTime}</Td>
                                 <Td fontSize="xs">{shift.location}</Td>
                                 <Td fontSize="xs" color="gray.400" maxW="150px" isTruncated>{shift.notes || '-'}</Td>
+                                <Td textAlign="right">
+                                    <Tooltip label="Send Manual Reminder" hasArrow>
+                                        <IconButton
+                                            aria-label="Send Reminder"
+                                            icon={<FiBell />}
+                                            size="xs"
+                                            variant="outline"
+                                            colorScheme="orange"
+                                            borderRadius="full"
+                                            onClick={() => onTriggerReminder(shift.id)}
+                                        />
+                                    </Tooltip>
+                                </Td>
                             </Tr>
                         ))}
                     </Tbody>
+
                 </Table>
             </PremiumCard>
         </Box>
@@ -214,6 +246,20 @@ export default function AssignShifts() {
         }
     });
 
+    const triggerReminderMutation = trpc.shift.triggerReminder.useMutation({
+        onSuccess: () => {
+            toast({ title: 'Reminder sent to personnel', status: 'success' });
+        },
+        onError: (e) => {
+            toast({ title: 'Error', description: e.message, status: 'error' });
+        }
+    });
+
+    const handleTriggerReminder = (shiftId: string) => {
+        triggerReminderMutation.mutate({ shiftId });
+    };
+
+
     const handleClose = () => {
         reset();
         setSelectedUser(null);
@@ -238,9 +284,29 @@ export default function AssignShifts() {
                 subtitle="Manage and archive team working hours."
                 icon={FiCalendar}
                 rightElement={
-                    <Button leftIcon={<FiPlus />} colorScheme="brand" onClick={onOpen} shadow="md">
-                        Assign New Shift
-                    </Button>
+                    <HStack spacing={3}>
+                        <Button 
+                            leftIcon={<FiBell />} 
+                            variant="outline" 
+                            colorScheme="orange" 
+                            onClick={() => {
+                                // Trigger reminders for all upcoming shifts
+                                if (activeGroups.length === 0) {
+                                    toast({ title: 'No upcoming shifts to remind', status: 'info' });
+                                    return;
+                                }
+                                const allShiftIds = activeGroups.flatMap(g => g.shifts.map(s => s.id));
+                                allShiftIds.forEach(id => triggerReminderMutation.mutate({ shiftId: id }));
+                            }}
+                            isLoading={triggerReminderMutation.isLoading}
+                            shadow="sm"
+                        >
+                            Send All Reminders
+                        </Button>
+                        <Button leftIcon={<FiPlus />} colorScheme="brand" onClick={onOpen} shadow="md">
+                            Assign New Shift
+                        </Button>
+                    </HStack>
                 }
             />
 
@@ -275,8 +341,14 @@ export default function AssignShifts() {
                         Current & Upcoming
                     </Heading>
                     {activeGroups.map(group => (
-                        <ShiftDateGroup key={group.dateStr} date={group.dateStr} shifts={group.shifts} />
+                        <ShiftDateGroup 
+                            key={group.dateStr} 
+                            date={group.dateStr} 
+                            shifts={group.shifts} 
+                            onTriggerReminder={handleTriggerReminder}
+                        />
                     ))}
+
                     {activeGroups.length === 0 && (
                         <Center py={10} flexDirection="column" bg="gray.50" borderRadius="xl" border="1px dashed" borderColor="gray.200">
                             <Icon as={FiCalendar} fontSize="3xl" color="gray.300" mb={2} />
@@ -304,10 +376,17 @@ export default function AssignShifts() {
                         <Collapse in={showHistory} animateOpacity>
                             <VStack spacing={6} align="stretch">
                                 {archivedGroups.map(group => (
-                                    <ShiftDateGroup key={group.dateStr} date={group.dateStr} shifts={group.shifts} isArchived />
+                                    <ShiftDateGroup 
+                                        key={group.dateStr} 
+                                        date={group.dateStr} 
+                                        shifts={group.shifts} 
+                                        isArchived 
+                                        onTriggerReminder={handleTriggerReminder}
+                                    />
                                 ))}
                             </VStack>
                         </Collapse>
+
                     </Box>
                 )}
             </VStack>
@@ -355,8 +434,10 @@ export default function AssignShifts() {
                                             <option value="Morning">Morning (6am-2pm)</option>
                                             <option value="Afternoon">Afternoon (2pm-10pm)</option>
                                             <option value="Night">Night (10pm-6am)</option>
+                                            <option value="OFF_DAY">Off Day</option>
                                             <option value="Custom">Custom Range</option>
                                         </Select>
+
                                     </FormControl>
                                 </HStack>
 

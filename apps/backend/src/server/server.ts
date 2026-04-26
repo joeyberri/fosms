@@ -2,7 +2,9 @@ import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import fastify from 'fastify';
 import { createContext } from './context';
 import { appRouter } from './router';
+import { startReminderJob } from '../modules/shift/reminder.service';
 import cors from '@fastify/cors';
+
 import pretty from 'pino-pretty';
 import pino from 'pino';
 import * as path from 'path';
@@ -58,8 +60,10 @@ export function createServer(opts: ServerOptions) {
   const stop = () => server.close();
   const start = async () => {
     try {
+      startReminderJob();
       await server.listen({ port, host: '0.0.0.0' });
     } catch (err) {
+
       server.log.error(err);
       process.exit(1);
     }

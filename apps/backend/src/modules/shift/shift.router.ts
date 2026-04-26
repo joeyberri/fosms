@@ -42,4 +42,12 @@ export const shiftRouter = router({
         .mutation(async ({ input, ctx }) => {
             return processSwap(input, ctx);
         }),
+
+    triggerReminder: adminProcedure
+        .input(z.object({ shiftId: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            const { triggerManualReminder } = await import('./shift.service');
+            return triggerManualReminder(input.shiftId, ctx);
+        }),
 });
+

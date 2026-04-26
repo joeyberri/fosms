@@ -29,6 +29,7 @@ import {
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
 import AuthHeader from '../Auth/AuthHeader/AuthHeader';
+import NotificationBell from '../Notifications/NotificationBell';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 import { useGlobalStateStore } from '../../app/GlobalState';
@@ -213,6 +214,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
+        <NotificationBell />
         <AuthHeader />
       </HStack>
     </Flex>

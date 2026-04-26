@@ -149,3 +149,29 @@ export const processSwap = async (
     // potentially involving transactions to update ShiftAssignments.
     // For now, we update the status.
 };
+
+export const triggerManualReminder = async (shiftId: string, ctx: Context) => {
+    const shift = await ctx.prisma.shiftAssignment.findUnique({
+        where: { id: shiftId },
+        include: { user: true },
+    });
+
+    if (!shift) {
+        throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Shift assignment not found',
+        });
+    }
+
+    const message = `Admin Alert: Manual reminder for your ${shift.shiftType} shift on ${shift.date.toLocaleDateString()}.`;
+    
+    return ctx.prisma.notification.create({
+        data: {
+            userId: shift.userId,
+            type: 'ADMIN_ALERT',
+            message,
+            shiftId: shift.id,
+        },
+    });
+};
+

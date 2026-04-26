@@ -23,7 +23,9 @@ import { motion } from 'framer-motion';
 import { FiCalendar, FiRefreshCw, FiUsers, FiBarChart2, FiClock, FiSettings } from 'react-icons/fi';
 import { PageHeader } from '../components/UI/PageHeader';
 import { PremiumCard } from '../components/UI/PremiumCard';
+import ReminderAlert from '../components/Notifications/ReminderAlert';
 import { trpc } from '../utils/trpc';
+
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -37,6 +39,10 @@ const Home = () => {
   const { data: mySchedule } = trpc.shift.mySchedule.useQuery();
   const { data: mySwapRequests } = trpc.shift.mySwapRequests.useQuery();
   const { data: colleagues } = trpc.user.listColleagues.useQuery();
+  const { data: unreadNotifications } = trpc.notification.getUnread.useQuery(undefined, {
+    enabled: !!user,
+  });
+
 
   // Calculate next shift
   const nextShift = useMemo(() => {
@@ -154,6 +160,9 @@ const Home = () => {
         subtitle="Here's what's happening in the factory today."
         icon={FiUsers}
       />
+
+      <ReminderAlert notifications={unreadNotifications || []} />
+
 
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={10}>
         <StatCard label="My Next Shift" number={nextShiftDisplay} help={nextShiftTime || 'Loading...'} icon={FiCalendar} />
